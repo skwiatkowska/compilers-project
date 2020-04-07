@@ -1,3 +1,6 @@
+grammar Lang;
+
+
 //parser - lowercased
 
 
