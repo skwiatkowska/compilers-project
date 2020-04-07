@@ -3,8 +3,11 @@ grammar Lang;
 
 //parser - lowercased
 
+type : INT | STRING | DOUBLE | BOOLEAN | VOID ;
+operator : PLUS | MINUS | DIV | MUL ;
 
-
+logic_operator : AND | OR ;
+relation_operator: NOT_EQUAL | EQUAL | GREATER_EQ | GREATER | LESS | LESS_EQ ;
 
 
 
@@ -41,8 +44,8 @@ RIGHT_PAREN : ')' ;
 LEFT_SQUARE_BR : '[' ;
 RIGHT_SQUARE_BR : ']' ;
 
-ANDAND : '&&' ;
-OROR : '||' ;
+AND : 'oraz' ;
+OR : 'lub' ;
 
 NOT_EQUAL : '!=?=' ;
 EQUAL : '=?=' ;
