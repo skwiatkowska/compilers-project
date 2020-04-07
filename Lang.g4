@@ -20,6 +20,13 @@ RETURN : 'zwroc' ;
 FUNCTION : 'funkcja' ;
 
 
+STRING : 'Napis' ;
+INT : 'Calkowita' ;
+DOUBLE : 'Rzeczywista' ;
+BOOLEAN : 'TypLogiczny' ;
+VOID : 'TypPusty' ;
+
+
 PRINT : 'pisz' ;
 
 DOT : '.' ;
