@@ -1,0 +1,46 @@
+*** komentarz jednolinijkowy
+
+#/#
+komentarz
+wielolinijkowy
+#/#
+
+klasa Klasa[
+    Napis nazwa1;
+    Calkowita num1;
+    
+
+    funkcja fun1(Calkowita i, Napis s) zwroc Calkowita[
+        Napis nazwa <= s;
+        pisz(nazwa);
+        Calkowita num2 <= i + 1;
+        zwroc num2;
+    ]
+
+    funkcja fun2(Calkowita a, Calkowita b) zwroc Napis[
+        jezeli(a <? b)[
+            zwroc("1");
+	]
+        inaczejJezeli(b =?= a)[
+            zwroc("2");
+	]
+	inaczej[
+	    zwroc("3");
+        ]
+      
+    ]
+
+    funkcja fun3()[
+        dlaKazdego (Calkowita i wZakresie 0..5) [
+            pisz(i);
+        ]
+    ]
+
+
+    start[
+        num1 <= 68;
+        nazwa1 <= fun2(3, 5);
+        pisz(nazwa1);
+        fun3();
+    ]
+]
