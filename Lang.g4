@@ -34,7 +34,12 @@ RIGHT_PAREN : ')' ;
 LEFT_SQUARE_BR : '[' ;
 RIGHT_SQUARE_BR : ']' ;
 
+ANDAND : '&&' ;
+OROR : '||' ;
+
+NOT_EQUAL : '!=?=' ;
 EQUAL : '=?=' ;
+
 GREATER : '>?' ;
 LESS : '<?' ;
 GREATER_EQ : '>=?' ;
