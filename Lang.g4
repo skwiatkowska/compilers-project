@@ -3,12 +3,16 @@ grammar Lang;
 
 //parser - lowercased
 
-type : INT | STRING | DOUBLE | BOOLEAN | VOID ;
-operator : PLUS | MINUS | DIV | MUL ;
+var_type : INT_TYPE | STRING_TYPE | DOUBLE_TYPE | BOOLEAN_TYPE;
+type : INT_TYPE | STRING_TYPE | DOUBLE_TYPE | BOOLEAN_TYPE | VOID ;
 
-logic_operator : AND | OR ;
-relation_operator: NOT_EQUAL | EQUAL | GREATER_EQ | GREATER | LESS | LESS_EQ ;
+math_operator : PLUS | MINUS | DIV | MUL ;
+logical_operator : AND | OR ;
+relation_operator : NOT_EQUAL | EQUAL | GREATER_EQ | GREATER | LESS | LESS_EQ ;
 
+
+
+declaration : var_type VAR_NAME SEMI ; //Napis a;
 
 
 
@@ -23,11 +27,17 @@ RETURN : 'zwroc' ;
 FUNCTION : 'funkcja' ;
 
 
-STRING : 'Napis' ;
-INT : 'Calkowita' ;
-DOUBLE : 'Rzeczywista' ;
-BOOLEAN : 'TypLogiczny' ;
+STRING_TYPE : 'Napis' ;
+INT_TYPE : 'Calkowita' ;
+DOUBLE_TYPE : 'Rzeczywista' ;
+BOOLEAN_TYPE : 'TypLogiczny' ;
 VOID : 'TypPusty' ;
+
+STRING : QUOT WORD QUOT ;
+INT : DIGIT+ ;
+DOUBLE: INT DOT INT ;
+BOOLEAN : TRUE | FALSE ;
+
 
 
 PRINT : 'pisz' ;
@@ -36,7 +46,7 @@ DOT : '.' ;
 COMMA : ',' ;
 SEMI : ';' ;
 COLON : ':' ;
-QUOTE : '"' ;
+QUOT : '"' ;
 
 LEFT_PAREN : '(' ;
 RIGHT_PAREN : ')' ;
@@ -57,6 +67,7 @@ LESS_EQ : '<=?' ;
 
 
 ASSIGN : '<=' ;
+
 PLUS : '+' ;
 MINUS : '-' ;
 MUL : '*' ;
@@ -69,10 +80,23 @@ ELSE : 'inaczej' ;
 
 FOR : 'dlaKazdego' ;
 IN_RANGE : 'wZakresie' ;
+DOT_DOR : '..' ;
 
 WHILE : 'dopoki' ;
 
+TRUE : 'prawda' ;
+FALSE : 'falsz' ;
+
+
+VAR_NAME : CHAR (CHAR | DIGIT)* ;
+
+
+fragment DIGIT : [0-9] ;
+fragment CHAR : [a-z] ;       
+fragment WORD : CHAR+ ;
+
 
 WS: [ \t\n\r]+ -> skip ; //whitespace
-COMMENT :  '***' ~[\r\n]* -> skip;
-BLOCK_COMMENT : '#/#' .*? '#/#' -> skip;
+COMMENT :  '***' ~[\r\n]* -> skip ;
+BLOCK_COMMENT : '#/#' .*? '#/#' -> skip ;
+
