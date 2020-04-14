@@ -8,13 +8,15 @@ wielolinijkowy
 klasa Klasa[
     Napis nazwa1;
     Calkowita num1;
+    Calkowita num2 <= 5l;
+    funkcja fun2(Calkowita a, Calkowita b) zwroc Napis; 
     
 
     funkcja fun1(Calkowita i, Napis s) zwroc Calkowita[
         Napis nazwa <= s;
         pisz(nazwa);
         Calkowita num2 <= i + 1;
-        zwroc num2;
+        zwroc (num2);
     ]
 
     funkcja fun2(Calkowita a, Calkowita b) zwroc Napis[
@@ -24,17 +26,26 @@ klasa Klasa[
         inaczejJezeli(b =?= a)[
             zwroc("2");
 	]
-	inaczej[
-	    zwroc("3");
+	   inaczej[
+	       zwroc("3");
         ]
       
     ]
 
     funkcja fun3()[
-        dlaKazdego (Calkowita i wZakresie 0..5) [
+        dlaKazdego (i wZakresie 0..5) [
             pisz(i);
         ]
     ]
+
+     funkcja fun4()[
+	   Calkowita x <= 0;
+        dopoki (x <? 10) [
+            pisz(x);
+		 x <= x+1;
+        ]
+    ]
+
 
 
     start[
@@ -42,5 +53,6 @@ klasa Klasa[
         nazwa1 <= fun2(3, 5);
         pisz(nazwa1);
         fun3();
+	   num1++;
     ]
 ]
