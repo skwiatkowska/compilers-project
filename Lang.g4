@@ -4,7 +4,6 @@ grammar Lang;
 //parser - lowercased
 
 var_type : INT_TYPE | STRING_TYPE | DOUBLE_TYPE | BOOLEAN_TYPE ;
-type : INT_TYPE | STRING_TYPE | DOUBLE_TYPE | BOOLEAN_TYPE | VOID ;
 
 
 operator : PLUS | MINUS | DIV | MUL ;
@@ -16,26 +15,38 @@ relation_operator : NOT_EQUAL | EQUAL | GREATER_EQ | GREATER | LESS | LESS_EQ ;
 declaration : var_type NAME ; //Napis a;
 definition : declaration assign_val ;
 assign_val : ASSIGN value ;
-assignment : NAME assign_val ; //b = "aa" / 1 / 1.1 / true | a | a+3 / -3 / 5-6 | fun(3)
+assignment : NAME assign_val ; 
+
 
 value: STRING_VAL | var_or_num_value | math_operation | fun_call ;
 var_or_num_value: NAME | INT_VAL | DOUBLE_VAL ;
 
+math_operation : LEFT_PAREN math_operation RIGHT_PAREN 
+	| math_operation operator math_operation 
+	| (MINUS)? var_or_num_value ;
 
-math_operation : LEFT_PAREN math_operation RIGHT_PAREN | math_operation operator math_operation | (MINUS)? var_or_num_value ;
 
 
 fun_call : NAME LEFT_PAREN (fun_args)? RIGHT_PAREN ;
-fun_args : value (COMMA value)* ; //a(2,5,"a")
+fun_args : value (COMMA value)* ; // fun(2,5,"a")
+fun_params : var_type NAME (COMMA var_type NAME)* ; // fun(Napis a, Calkowita b, Calkowita c)
 
-fun_params : var_type NAME (COMMA var_type NAME)* ;
+fun_declaration : FUNCTION NAME LEFT_PAREN (fun_params)? RIGHT_PAREN (RETURN var_type)? ;
+
+fun_def : fun_declaration body ;
+
+
+class_def : CLASS NAME LEFT_SQUARE_BR code* main? RIGHT_SQUARE_BR ;
 
 
 print : PRINT LEFT_PAREN value RIGHT_PAREN ;
 return_value : RETURN LEFT_PAREN value RIGHT_PAREN ;
 
-line : (declaration | definition | assignment | return_value | print | fun_call) SEMI ;
+line : if_def | for_def | while_def | line_semi ;
+line_semi : (declaration | definition | assignment | return_value | print | fun_call | increment | decrement ) SEMI ;
 body : LEFT_SQUARE_BR line+ RIGHT_SQUARE_BR ;
+code : ((declaration | definition | fun_declaration) SEMI) | fun_def ;
+main : MAIN body ;
 
 
 
@@ -51,6 +62,13 @@ if_def : IF brack_logical_stm body
     	(ELSE body)? ;
 
 
+for_def : FOR LEFT_PAREN NAME IN_RANGE INT_VAL DOT_DOT INT_VAL RIGHT_PAREN body ; 
+
+while_def : WHILE brack_logical_stm body ;
+
+
+increment : NAME PLUS PLUS ;
+decrement : NAME MINUS MINUS ;
 
 
 
@@ -60,13 +78,14 @@ if_def : IF brack_logical_stm body
 CLASS : 'klasa' ;
 RETURN : 'zwroc' ;
 FUNCTION : 'funkcja' ;
+MAIN : 'start' ;
+PRINT : 'pisz' ;
 
 
 STRING_TYPE : 'Napis' ;
 INT_TYPE : 'Calkowita' ;
 DOUBLE_TYPE : 'Rzeczywista' ;
 BOOLEAN_TYPE : 'TypLogiczny' ;
-VOID : 'TypPusty' ;
 
 STRING_VAL : QUOT ~["]* QUOT;
 INT_VAL : DIGIT+ ;
@@ -74,9 +93,6 @@ DOUBLE_VAL : INT_VAL DOT INT_VAL ;
 BOOLEAN_VAL : TRUE | FALSE ;
 
 
-
-
-PRINT : 'pisz' ;
 
 DOT : '.' ;
 COMMA : ',' ;
@@ -122,7 +138,6 @@ WHILE : 'dopoki' ;
 
 TRUE : 'prawda' ;
 FALSE : 'falsz' ;
-
 
 
 NAME : [a-zA-Z0-9]+ ;
