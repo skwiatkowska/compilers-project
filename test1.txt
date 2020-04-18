@@ -8,7 +8,7 @@ wielolinijkowy
 klasa Klasa[
     Napis nazwa1;
     Calkowita num1;
-    Calkowita num2 <= 5l;
+    Calkowita num2 <= 51;
     funkcja fun2(Calkowita a, Calkowita b) zwroc Napis; 
     
 
