@@ -7,7 +7,8 @@ Custom lang parser with ANTLR4 library
 
 We are constructing a language which uses polish keywords.
 
-Basic keywords:
+## Basic keywords:
+
  'klasa' -  class
  
  'zwroc'  - return 
@@ -20,7 +21,7 @@ Basic keywords:
  
  
 
-Types:
+## Types:
 
  'Napis' - string 
  
@@ -32,7 +33,7 @@ Types:
  
 
 
-Operators:
+## Operators:
 
 
  'oraz' - and 
@@ -55,7 +56,7 @@ Operators:
  
 
 
-Program control:
+## Program control:
 
  'jezeli'  - if
  
