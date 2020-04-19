@@ -39,11 +39,11 @@ fun_def : fun_declaration body ;
 class_def : CLASS NAME LEFT_SQUARE_BR code* main? RIGHT_SQUARE_BR ;
 
 
-print : PRINT LEFT_PAREN value RIGHT_PAREN ;
+printf : PRINTF LEFT_PAREN value RIGHT_PAREN ;
 return_value : RETURN LEFT_PAREN value RIGHT_PAREN ;
 
 line : if_def | for_def | while_def | line_semi ;
-line_semi : (declaration | definition | assignment | return_value | print | fun_call | increment | decrement ) SEMI ;
+line_semi : (declaration | definition | assignment | return_value | printf | fun_call | increment | decrement ) SEMI ;
 body : LEFT_SQUARE_BR line+ RIGHT_SQUARE_BR ;
 code : ((declaration | definition | fun_declaration) SEMI) | fun_def ;
 main : MAIN body ;
@@ -79,7 +79,7 @@ CLASS : 'klasa' ;
 RETURN : 'zwroc' ;
 FUNCTION : 'funkcja' ;
 MAIN : 'start' ;
-PRINT : 'pisz' ;
+PRINTF : 'pisz' ;
 
 
 STRING_TYPE : 'Napis' ;
@@ -151,4 +151,3 @@ fragment WORD : CHAR+ ;
 WS: [ \t\n\r]+ -> skip ; //whitespace
 COMMENT :  '***' ~[\r\n]* -> skip ;
 BLOCK_COMMENT : '#/#' .*? '#/#' -> skip ;
-
