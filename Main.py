@@ -29,8 +29,6 @@ class LangVarListener(LangBaseListener):
         elif ctx.LESS_EQ():
             print(" <= ", end='')
 
-    def enterClass_def(self, ctx: LangParser.Class_defContext):
-        print("class", ctx.NAME().getText(), ":")
 
     # def enterDeclaration(self, ctx: LangParser.Class_defContext):
     #    print(ctx.NAME().getText())
@@ -64,6 +62,41 @@ class LangVarListener(LangBaseListener):
             print(ctx.INT_VAL().getText(), end='')
         elif ctx.INT_VAL:
             print(ctx.DOUBLE_VAL().getText(), end='')
+			
+			
+	    def enterFun_call(self, ctx: LangParser.Fun_callContext):
+        print(ctx.NAME().getText(), "(", end='')
+
+    def exitFun_call(self, ctx: LangParser.Fun_callContext):
+        print(")")
+
+    def enterFun_args(self, ctx: LangParser.Fun_argsContext):
+        pass
+
+    def enterFun_params(self, ctx: LangParser.Fun_paramsContext):
+        pass
+        """
+        for child in ctx.getChildren():
+            if child != LangParser.Var_typeContext:
+                if child.NAME():
+                    print(child.NAME().getText(), end='')
+                elif child.COMA():
+                    print(",", end='')
+        """
+
+    def enterFun_declaration(self, ctx: LangParser.Fun_declarationContext):
+        print(ctx.NAME().getText(), "(", end='')
+
+    def exitFun_declaration(self, ctx: LangParser.Fun_declarationContext):
+        print("):")
+
+    def enterFun_def(self, ctx: LangParser.Fun_defContext):
+        print("def ", end='')
+        pass
+
+    def enterClass_def(self, ctx: LangParser.Class_defContext):
+        print("class", ctx.NAME().getText(), ":")
+		
 
     def enterPrintf(self, ctx: LangParser.PrintfContext):
         print("\nprint(", end='')
@@ -77,6 +110,11 @@ class LangVarListener(LangBaseListener):
     def exitReturn_value(self, ctx: LangParser.Return_valueContext):
         print()
 
+	def enterIncrement(self, ctx: LangParser.IncrementContext):
+        print(ctx.NAME().getText(), "+= 1")
+
+    def enterDecrement(self, ctx: LangParser.DecrementContext):
+        print(ctx.NAME().getText(), "-= 1")
 
 def main():
     input_stream = FileStream("test1.txt")  # sys.argv[1])
