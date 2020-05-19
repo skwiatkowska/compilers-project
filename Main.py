@@ -2,309 +2,329 @@ from antlr4 import *
 from LangLexer import LangLexer
 from LangListener import LangListener  as LangBaseListener
 from LangParser import LangParser
-import sys
 
 
 class LangVarListener(LangBaseListener):
+
+    tab = 0
+
     def enterOperator(self, ctx: LangParser.OperatorContext):
-        print("", ctx.getText(), "", end='')
+        return ctx.getText()
 
     def enterLogical_operator(self, ctx: LangParser.Logical_operatorContext):
         if ctx.AND():
-            print(" and ")
+            return " and "
         else:
-            print(" or ")
+            return " or "
 
     def enterRelation_operator(self, ctx: LangParser.Relation_operatorContext):  # added returns for logical statements
         if ctx.NOT_EQUAL():
-         #   print(" != ", end='')
             return "!="
         elif ctx.EQUAL():
-         #   print(" == ", end='')
             return "=="
         elif ctx.GREATER_EQ():
-         #   print(" >= ", end='')
             return ">="
         elif ctx.GREATER():
-         #   print(" > ", end='')
             return ">"
         elif ctx.LESS():
-         #   print(" < ", end='')
             return "<"
         elif ctx.LESS_EQ():
-         #   print(" <= ", end='')
             return "<="
 
-    # def enterDeclaration(self, ctx: LangParser.Class_defContext):
-    #    print(ctx.NAME().getText())
+
 
     def enterDeclaration(self, ctx:LangParser.DeclarationContext):
-        return str(ctx.NAME())
+        return str(ctx.NAME().getText())
 
     def exitDeclaration(self, ctx:LangParser.DeclarationContext):
-        print()
+        pass
+
 
     def enterDefinition(self, ctx: LangParser.DefinitionContext):
-        child2 = 'nie ma deklaracji'
-
-        if hasattr(ctx, "declaration"):
-            child2 = self.enterDeclaration(ctx.declaration()) + "="
-            def_value = self.enterAssign_val(ctx.assign_val())
-            child2 += def_value
-            print(child2)
-
-        return child2
+        name = self.enterDeclaration(ctx.getChild(0))
+        val = self.enterAssign_val(ctx.getChild(1))
+        return name+" = "+val
 
     def exitDefinition(self, ctx: LangParser.DefinitionContext):
-        print("")
+        pass
+
 
     def enterAssign_val(self, ctx: LangParser.Assign_valContext):
-        if isinstance(ctx, LangParser.Assign_valContext):
-            as_v_str = str(self.enterValue(ctx.value()))
-        return as_v_str
+        val = ctx.getChild(1)
+        as_val = str(self.enterValue(val))
+        return as_val
 
     def enterAssignment(self, ctx: LangParser.AssignmentContext):
-        #print(ctx.NAME().getText(), "= ", end='')
-        assign_str = str(ctx.NAME().getText()) + "= " + 'assignment string'
+        assign_str = str(ctx.NAME().getText()) + " = " + self.enterAssign_val(ctx.getChild(1))
         return assign_str
 
     def exitAssignment(self, ctx: LangParser.AssignmentContext):
-        print('')
+        pass
+
+
 
     def enterValue(self, ctx: LangParser.ValueContext):
-        if ctx.STRING_VAL():  #print(ctx.STRING_VAL().getText(), end='')
-            str_v = ctx.STRING_VAL()
+        child = ctx.getChild(0)
+        if isinstance(child, LangParser.Var_or_num_valueContext):
+            n_str = str(self.enterVar_or_num_value(child))
+            return n_str
+        elif isinstance(child, LangParser.Math_operationContext):
+            math_str = str(self.enterMath_operation(child))
+            return math_str
+        elif isinstance(child, LangParser.Fun_callContext):
+            func_str = str(self.enterFun_call(ctx.fun_call()))
+            return func_str
+        else:
+            str_v = child.getText()
             return str_v
 
-        if ctx.var_or_num_value():
-            n_str = str(self.enterVar_or_num_value(ctx.var_or_num_value()))
-            return n_str
-
-        if hasattr(ctx, "math_operation"):
-            math_str = str(self.enterMath_operation(ctx.math_operation()))
-            return math_str
-
-        if hasattr(ctx, "fun_call"):
-            func_str = str(self.enterFun_call(ctx.fun_call()))
-            print('funkcja')
-            return func_str
-
-
-
-
-
-
-
     def enterVar_or_num_value(self, ctx: LangParser.Var_or_num_valueContext):
-        if(ctx.NAME()):
-           # print(ctx.NAME().getText(), end='')
-            #print('name')
-            str_s = str(ctx.NAME())
-            return str_s  #zmienic dla wszystkich
-        elif ctx.INT_VAL:
-            #print(ctx.INT_VAL().getText(), end='')
-            return str(ctx.INT_VAL().getText())
-        elif ctx.DOUBLE_VAL:
-            #print(ctx.DOUBLE_VAL().getText(), end='')
-            return str(ctx.DOUBLE_VAL().getText())
+        child = ctx.getChild(0)
+        str = child.getText()
+        return str
 
 
     def enterMath_operation(self, ctx:LangParser.Math_operationContext):
-        #math_str = str(self.enterMath_operation(ctx.math_operation()))
-        #print('math in math')
-        print('', end='')
+        if ctx != None:
+            children = ctx.getChildren()
+            operation = []
+            for child in children:
+                if isinstance(child,LangParser.Math_operationContext):
+                    operation.append(self.enterMath_operation(child))
+                elif isinstance(child,LangParser.OperatorContext):
+                    operation.append(self.enterOperator(child))
+                elif isinstance(child,LangParser.Var_or_num_valueContext):
+                    operation.append(self.enterVar_or_num_value(child))
+                else:
+                    operation.append(child.getText())
+            return ' '.join(operation)
+
 
     def exitMath_operation(self, ctx:LangParser.Math_operationContext):
-        print()
+        pass
+
+
+
+# ----------------   FUNKCJA
 
     def enterFun_call(self, ctx: LangParser.Fun_callContext):
-        print(ctx.NAME().getText(), "(", end='')
+        name = ctx.NAME().getText()
+        fun_args = ""
+        if ctx.fun_args():
+            fun_args = self.enterFun_args(ctx.getChild(2))
+        call = name + "(" + fun_args + ")"
+        return call
 
     def exitFun_call(self, ctx: LangParser.Fun_callContext):
-        print(")")
+        pass
 
     def enterFun_args(self, ctx: LangParser.Fun_argsContext):
-        pass
+        args = []
+        children = ctx.getChildren()
+        for child in children:
+            if isinstance(child, LangParser.ValueContext):
+                args.append(str(self.enterValue(child)))
+            else:
+                args.append(",")
+        return ''.join(args)
 
     def enterFun_params(self, ctx: LangParser.Fun_paramsContext):
-        pass
-        """
-        for child in ctx.getChildren():
-            if child != LangParser.Var_typeContext:
-                if child.NAME():
-                    print(child.NAME().getText(), end='')
-                elif child.COMA():
-                    print(",", end='')
-        """
+        params = []
+        children = ctx.getChildren()
+        for child in children:
+            if not isinstance(child, LangParser.Var_typeContext):
+                params.append(child.getText())
+        return params
+
 
     def enterFun_declaration(self, ctx: LangParser.Fun_declarationContext):
-        print(ctx.NAME().getText(), "(", end='')
+        name = ctx.NAME().getText()
+        params = ""
+        children = ctx.getChildren()
+        for child in children:
+            if isinstance(child,LangParser.Fun_paramsContext):
+                params = self.enterFun_params(child)
+        return [name,''.join(params)]
 
     def exitFun_declaration(self, ctx: LangParser.Fun_declarationContext):
-        print("):")
-
-    def enterFun_def(self, ctx: LangParser.Fun_defContext):
-        print("def ", end='')
         pass
 
+
+    def enterFun_def(self, ctx: LangParser.Fun_defContext):
+        dec = self.enterFun_declaration(ctx.getChild(0))
+        print("def "+dec[0]+"("+dec[1]+"):")
+        body = self.enterBody(ctx.getChild(1))
+        print(body)
+
+
     def enterClass_def(self, ctx: LangParser.Class_defContext):
-        print("class", ctx.NAME().getText(), ":")
+        print("class", ctx.NAME().getText()+":")
 
     def enterPrintf(self, ctx: LangParser.PrintfContext):
-        print("\nprint(", end='')
+        val = self.enterValue(ctx.getChild(2))
+        prt = "print(" + val + ")"
+        return prt
 
     def exitPrintf(self, ctx: LangParser.PrintfContext):
-        print(")")
+        pass
 
     def enterReturn_value(self, ctx: LangParser.Return_valueContext):
-        #print("\nreturn ", end='')
-        return_str = "\nreturn "
+        return_str = "return "
         ret_value = str(self.enterValue(ctx.value()))
         return_str += ret_value
         return return_str
 
     def exitReturn_value(self, ctx: LangParser.Return_valueContext):
-        print()
+        pass
 
     def enterIncrement(self, ctx: LangParser.IncrementContext):
-        print(ctx.NAME().getText(), "+= 1")
+        inc = ctx.NAME().getText() + " += 1"
+        return inc
 
     def enterDecrement(self, ctx: LangParser.DecrementContext):
-        print(ctx.NAME().getText(), "-= 1")
-
+        dec = ctx.NAME().getText() + " -= 1"
+        return dec
 
 #----------------   LOGICZNE
 
     def enterConditions(self, ctx: LangParser.ConditionsContext):
-        #print(ctx.logical_operator())  #pusta lista
-        number_of_operators = 0 #len(ctx.logical_operator) - sprawdzic pozniej przez isEmpty()
+        children = ctx.getChildren()
+        conditions = []
+        for child in children:
+            if isinstance(child,LangParser.ConditionContext):
+                conditions.append(str(self.enterCondition(child)))
+            elif isinstance(child,LangParser.Logical_operatorContext):
+                conditions.append(str(self.enterLogical_operator(child)))
+        return ''.join(conditions)
 
-        #print('(', end='')
-
-        if (number_of_operators == 0):
-            conditions = str(self.enterCondition(ctx.condition()[0]))  # to daje: 	x < None10    None (kolejny None dolaczyl)
-            return conditions
-        else:
-            conditions = "too many conditions"
-            return conditions
-          #  operator_counter = 0
-          #  for i in range(number_of_operators + 1):
-          #      print(self.enterCondition(ctx.condition()[i]), end='')
-          #      if (operator_counter!=number_of_operators):
-          #          print(ctx.logical_operator()[operator_counter], end='')
 
     def exitConditions(self, ctx: LangParser.ConditionsContext):
-        print('', end='')
+        pass
 
     def enterCondition(self, ctx:LangParser.ConditionContext):
         variable = ctx.var_or_num_value()[0].getText()
         operatorr = self.enterRelation_operator(ctx.relation_operator())
         value = ctx.var_or_num_value()[1].getText()
-        condition = variable + str(operatorr) + value
+        condition = variable + " " + str(operatorr) + " " + value
         return condition
 
     def exitCondition(self, ctx:LangParser.ConditionContext):
-        print('', end='')
+        pass
 
     def enterLogical_stmt(self, ctx:LangParser.Logical_stmtContext):
         logical_statement = str(self.enterConditions(ctx.conditions()))
         return logical_statement
 
     def exitLogical_stmt(self, ctx:LangParser.Logical_stmtContext):
-        print('', end='')
+        pass
 
     def enterBrack_logical_stm(self, ctx:LangParser.Brack_logical_stmContext):
         logical_bracket = str(self.enterLogical_stmt(ctx.logical_stmt()))
         return logical_bracket
 
     def exitBrack_logical_stm(self, ctx:LangParser.Brack_logical_stmContext):
-        print('', end='')
+        pass
 
 
 #-------------------    PETLE, IF
 
     def enterWhile_def(self, ctx:LangParser.While_defContext):  #dziala
         while_statement = str(self.enterBrack_logical_stm(ctx.brack_logical_stm()))
-        print('\nwhile (', while_statement, '):' )
+        #print('while', while_statement + ':')
+        body = self.enterBody(ctx.body())
+        return ''.join(['while ', while_statement, ':\n',body])
 
     def exitWhile_def(self, ctx:LangParser.While_defContext):
-        print('', end='')
+        pass
 
 
     def enterFor_def(self, ctx:LangParser.For_defContext):
-        print('\nfor(', ctx.NAME().getText(), 'in range(', ctx.INT_VAL()[0], ',', ctx.INT_VAL()[1],')):')
+        statement = 'for '+ ctx.NAME().getText() + ' in range('+str(ctx.INT_VAL()[0])+','+str(ctx.INT_VAL()[1])+'):\n'
+        body = self.enterBody(ctx.body())
+        #print(body)
+        return ''.join([statement,body])
 
     def exitFor_def(self, ctx:LangParser.For_defContext):
-        print('', end='')
+        pass
+
 
     def enterIf_def(self, ctx:LangParser.If_defContext):
-
-        if(ctx.IF()):           # zmienic logiczne statementy na poprawne:
-                                #usunac nawiasy kwadratowe
-            if_statement = str(self.enterBrack_logical_stm(ctx.brack_logical_stm()[0]))
-            print('if(', if_statement, '): ', end='')
-            print(ctx.body()[0].getText())  # [zwroc("1");]
-            body1 = self.enterBody(ctx.body()[0])
-            print(body1, 'body1')
-
-        if(ctx.ELSE_IF()):
-            elif_statement = str(self.enterBrack_logical_stm(ctx.brack_logical_stm()[1]))
-            print('elif(', elif_statement, '):', end="")
-            print(ctx.body()[1].getText())  # [zwroc("2");]
-        if(ctx.ELSE()):
-            print('else:')
-            print(ctx.body()[2].getText())  # [zwroc("3");]
-
+        children = ctx.getChildren()
+        df = []
+        for child in children:
+            if isinstance(child, LangParser.Brack_logical_stmContext):
+                statement = str(self.enterBrack_logical_stm(child))
+                df.append(statement+':\n')
+            elif isinstance(child, LangParser.BodyContext):
+                body = self.enterBody(child)
+                df.append(body)
+            else:
+                text = child.getText()
+                if text == 'jezeli':
+                    df.append("if ")
+                elif text == 'inaczejJezeli':
+                    df.append("\t"*tab+"elif ")
+                else:
+                    df.append("\t"*tab+"else:\n")
+        return ''.join(df)
 
     def exitIf_def(self, ctx:LangParser.If_defContext):
-        print('', end='')
+        pass
 
 
 # LINE, SEMI-LINE
     # Enter a parse tree produced by LangParser#line.
     def enterLine(self, ctx:LangParser.LineContext):
-        list_of_lines = ctx
-        if isinstance(list_of_lines, list):
-            line_str=''
-            for i in range(len(list_of_lines)):
-                line_str += str(self.enterLine_semi(ctx[i].line_semi())) + '\n'
+        child = ctx.getChild(0)
+        if isinstance(child, LangParser.Line_semiContext):
+            line_str = str(self.enterLine_semi(child))
+            return line_str
+        elif isinstance(child, LangParser.If_defContext):
+            line_str = str(self.enterIf_def(child))
+            return line_str
+        elif isinstance(child, LangParser.For_defContext):
+            line_str = str(self.enterFor_def(child))
+            return line_str
+        elif isinstance(child, LangParser.While_defContext):
+            line_str = str(self.enterWhile_def(child))
+            return line_str
         else:
-            line_str = str(self.enterLine_semi(ctx.line_semi()))  # tak dla wszystkich
-        return line_str
+            return "\t"
 
     def exitLine(self, ctx:LangParser.LineContext):
-        print()
+        pass
 
     def enterLine_semi(self, ctx:LangParser.Line_semiContext):
-        if hasattr(ctx, "definition"):
-            func_str = str(self.enterDefinition(ctx.definition()))
-            return func_str
+        if ctx != None:
+            line = ctx.getChild(0)
+            if isinstance(line, LangParser.DeclarationContext):
+                func_str = str(self.enterDeclaration(line))
+                return func_str
+            elif isinstance(line, LangParser.DefinitionContext):
+                func_str = str(self.enterDefinition(line))
+                return func_str
+            elif isinstance(line, LangParser.AssignmentContext):
+                func_str = str(self.enterAssignment(line))
+                return func_str
+            elif isinstance(line, LangParser.Return_valueContext):
+                func_str = str(self.enterReturn_value(line))
+                return func_str
+            elif isinstance(line, LangParser.PrintfContext):
+                func_str = str(self.enterPrintf(line))
+                return func_str
+            elif isinstance(line, LangParser.Fun_callContext):
+                func_str = str(self.enterFun_call(line))
+                return func_str
+            elif isinstance(line, LangParser.IncrementContext):
+                func_str = str(self.enterIncrement(line))
+                return func_str
+            elif isinstance(line, LangParser.DecrementContext):
+                func_str = str(self.enterDecrement(line))
+                return func_str
 
-        if hasattr(ctx, "assignment"):
-            func_str = str(self.enterAssignment(ctx.assignment().getText()))
-            print('assignment')
-            return func_str
-        if hasattr(ctx, "return_value"):
-            func_str = str(self.enterFun_call(ctx.fun_call()))
-            print('return_value')
-            return func_str
-        if hasattr(ctx, "printf"):
-            func_str = str(self.enterFun_call(ctx.fun_call()))
-            print('printf')
-            return func_str
-        if hasattr(ctx, "fun_call"):
-            func_str = str(self.enterFun_call(ctx.fun_call()))
-            print('funkcja')
-            return func_str
-        if hasattr(ctx, "increment"):
-            func_str = str(self.enterFun_call(ctx.fun_call()))
-            print('increment')
-            return func_str
-
-        return 'return z semi line'
 
     def exitLine_semi(self, ctx:LangParser.Line_semiContext):
-        print('  ')
+        pass
 
 
 
@@ -312,31 +332,48 @@ class LangVarListener(LangBaseListener):
 
     def enterBody(self, ctx:LangParser.BodyContext):
       #  print('    ', end='')   #robi TAB w ciele funkcji w pierwszej linijce
-        body_str = str(self.enterLine(ctx.line()))
-        return body_str
+        global tab
+        tab += 1
+        body = []
+        children = ctx.getChildren()
+        for child in children:
+            if isinstance(child, LangParser.LineContext):
+                body.append("\t"*tab+str(self.enterLine(child))+"\n")
+        tab -= 1
+        return ''.join(body)
 
     def exitBody(self, ctx:LangParser.BodyContext):
-        print('', end= '')
+        pass
 
 
 
 # ---------------------  CODE
     def enterCode(self, ctx:LangParser.CodeContext):
-        #print('    ', end='')   #robi TAB przed atrybutami klasy i definicjami funkcji klasy
-        print()
+        global tab
+        tab = 1
+        child = ctx.getChild(0)
+        if isinstance(child, LangParser.Fun_defContext) :
+            print('\n', '\t'*tab, end='')   #robi TAB przed atrybutami klasy i definicjami funkcji klasy
+        if isinstance(child,LangParser.DefinitionContext):
+            print('\n', '\t' * tab, end='')
+            df = self.enterDefinition(child)
+            print(df)
 
     # Exit a parse tree produced by LangParser#code.
     def exitCode(self, ctx:LangParser.CodeContext):
-        print('', end='')
+        global tab
+        tab -= 1
 
 
     # Enter a parse tree produced by LangParser#main.
     def enterMain(self, ctx:LangParser.MainContext):
-        print('main(): ')
+        print('def main(): ')
+        body = self.enterBody(ctx.getChild(1))
+        print(body)
 
     # Exit a parse tree produced by LangParser#main.
     def exitMain(self, ctx:LangParser.MainContext):
-        print()
+        pass
 
 
 
