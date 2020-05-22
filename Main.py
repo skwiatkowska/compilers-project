@@ -3,11 +3,12 @@ from LangLexer import LangLexer
 from LangListener import LangListener  as LangBaseListener
 from LangParser import LangParser
 
+import sys
+
 
 class LangVarListener(LangBaseListener):
 
     tab = 0
-
     def enterOperator(self, ctx: LangParser.OperatorContext):
         return ctx.getText()
 
@@ -30,7 +31,6 @@ class LangVarListener(LangBaseListener):
             return "<"
         elif ctx.LESS_EQ():
             return "<="
-
 
 
     def enterDeclaration(self, ctx:LangParser.DeclarationContext):
@@ -331,7 +331,6 @@ class LangVarListener(LangBaseListener):
 #-------------------- BODY
 
     def enterBody(self, ctx:LangParser.BodyContext):
-      #  print('    ', end='')   #robi TAB w ciele funkcji w pierwszej linijce
         global tab
         tab += 1
         body = []
@@ -357,27 +356,31 @@ class LangVarListener(LangBaseListener):
         if isinstance(child,LangParser.DefinitionContext):
             print('\n', '\t' * tab, end='')
             df = self.enterDefinition(child)
+          #  pf.write(df)
             print(df)
 
-    # Exit a parse tree produced by LangParser#code.
     def exitCode(self, ctx:LangParser.CodeContext):
         global tab
         tab -= 1
 
-
-    # Enter a parse tree produced by LangParser#main.
     def enterMain(self, ctx:LangParser.MainContext):
         print('def main(): ')
         body = self.enterBody(ctx.getChild(1))
         print(body)
 
-    # Exit a parse tree produced by LangParser#main.
     def exitMain(self, ctx:LangParser.MainContext):
         pass
 
 
 
 def main():
+
+    orig_stdout = sys.stdout
+    #setting up a file where program will translate code to Python
+    f = open('python_file.py', 'w')
+    sys.stdout = f
+
+
     input_stream = FileStream("test1.txt")  # sys.argv[1])
     lexer = LangLexer(input_stream)
     # lexer = LangLexer(StdinStream())
@@ -389,6 +392,13 @@ def main():
 
     walker = ParseTreeWalker()
     walker.walk(listener, tree)
+
+
+   #adding string to file works
+
+    sys.stdout = orig_stdout
+    f.close()
+
 
 
 if __name__ == '__main__':
