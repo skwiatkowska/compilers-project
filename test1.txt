@@ -9,6 +9,7 @@ klasa Klasa[
     Napis nazwa1;
     Calkowita num1;
     Calkowita num2 <= 51;
+    Tablica Napis tablica1 <= {"a", "b", "c"};
     funkcja fun2(Calkowita a, Calkowita b) zwroc Napis; 
     
 

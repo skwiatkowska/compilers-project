@@ -17,6 +17,7 @@ definition : declaration assign_val ;
 assign_val : ASSIGN value ;
 assignment : NAME assign_val ; 
 
+array_def : ARRAY_TYPE var_type NAME ASSIGN LEFT_CURLY_BR (var_or_num_value | STRING_VAL)? (COMMA (var_or_num_value | STRING_VAL))* RIGHT_CURLY_BR ;
 
 value: STRING_VAL | var_or_num_value | math_operation | fun_call ;
 var_or_num_value: NAME | INT_VAL | DOUBLE_VAL ;
@@ -36,16 +37,16 @@ fun_declaration : FUNCTION NAME LEFT_PAREN (fun_params)? RIGHT_PAREN (RETURN var
 fun_def : fun_declaration body ;
 
 
-class_def : CLASS NAME LEFT_SQUARE_BR code* main? RIGHT_SQUARE_BR ;
+class_def : CLASS NAME LEFT_SQUARE_BR code* main? RIGHT_SQUARE_BR ; //root
 
 
 printf : PRINTF LEFT_PAREN value RIGHT_PAREN ;
 return_value : RETURN LEFT_PAREN value RIGHT_PAREN ;
 
 line : if_def | for_def | while_def | line_semi ;
-line_semi : (declaration | definition | assignment | return_value | printf | fun_call | increment | decrement ) SEMI ;
+line_semi : (declaration | definition | assignment | return_value | printf | fun_call | increment | decrement | array_def) SEMI ;
 body : LEFT_SQUARE_BR line+ RIGHT_SQUARE_BR ;
-code : ((declaration | definition | fun_declaration) SEMI) | fun_def ;
+code : ((declaration | definition | array_def | fun_declaration) SEMI) | fun_def ;
 main : MAIN body ;
 
 
@@ -81,7 +82,7 @@ FUNCTION : 'funkcja' ;
 MAIN : 'start' ;
 PRINTF : 'pisz' ;
 
-
+ARRAY_TYPE : 'Tablica' ;
 STRING_TYPE : 'Napis' ;
 INT_TYPE : 'Calkowita' ;
 DOUBLE_TYPE : 'Rzeczywista' ;
@@ -105,6 +106,9 @@ RIGHT_PAREN : ')' ;
 
 LEFT_SQUARE_BR : '[' ;
 RIGHT_SQUARE_BR : ']' ;
+
+LEFT_CURLY_BR : '{' ;
+RIGHT_CURLY_BR : '}' ;
 
 AND : 'oraz' ;
 OR : 'lub' ;

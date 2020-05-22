@@ -1,1 +1,3 @@
 antlr4 -Dlanguage=Python3 Lang.g4 -o generated
+
+grun Lang fun_def -gui

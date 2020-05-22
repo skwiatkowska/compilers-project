@@ -80,6 +80,15 @@ class LangListener(ParseTreeListener):
         pass
 
 
+    # Enter a parse tree produced by LangParser#array_def.
+    def enterArray_def(self, ctx:LangParser.Array_defContext):
+        pass
+
+    # Exit a parse tree produced by LangParser#array_def.
+    def exitArray_def(self, ctx:LangParser.Array_defContext):
+        pass
+
+
     # Enter a parse tree produced by LangParser#value.
     def enterValue(self, ctx:LangParser.ValueContext):
         pass
