@@ -62,6 +62,21 @@ class LangVarListener(LangBaseListener):
         pass
 
 
+    def enterArray_def(self, ctx: LangParser.Array_defContext):
+        name = str(ctx.NAME().getText())
+        children = ctx.getChildren()
+        content = []
+        count = 0
+        for child in children:
+            if count > 4:
+                if isinstance(child, LangParser.Var_or_num_valueContext):
+                    content.append(self.enterVar_or_num_value(child))
+                elif child.getText() not in ["<=","{","}"]:
+                    content.append(child.getText())
+            count += 1
+        content = ''.join(content)
+        return name+" = ["+content+"]"
+
 
     def enterValue(self, ctx: LangParser.ValueContext):
         child = ctx.getChild(0)
@@ -158,7 +173,8 @@ class LangVarListener(LangBaseListener):
 
 
     def enterClass_def(self, ctx: LangParser.Class_defContext):
-        print("class", ctx.NAME().getText()+":")
+        #print("class", ctx.NAME().getText()+":")
+        pass
 
     def enterPrintf(self, ctx: LangParser.PrintfContext):
         val = self.enterValue(ctx.getChild(2))
@@ -321,6 +337,9 @@ class LangVarListener(LangBaseListener):
             elif isinstance(line, LangParser.DecrementContext):
                 func_str = str(self.enterDecrement(line))
                 return func_str
+            elif isinstance(line, LangParser.Array_defContext):
+                func_str = str(self.enterArray_def(line))
+                return func_str
 
 
     def exitLine_semi(self, ctx:LangParser.Line_semiContext):
@@ -349,19 +368,21 @@ class LangVarListener(LangBaseListener):
 # ---------------------  CODE
     def enterCode(self, ctx:LangParser.CodeContext):
         global tab
-        tab = 1
+        tab = 0
         child = ctx.getChild(0)
-        if isinstance(child, LangParser.Fun_defContext) :
-            print('\n', '\t'*tab, end='')   #robi TAB przed atrybutami klasy i definicjami funkcji klasy
+        #if isinstance(child, LangParser.Fun_defContext) :
+        #    print('\n', '\t'*tab, end='')   #robi TAB przed atrybutami klasy i definicjami funkcji klasy
         if isinstance(child,LangParser.DefinitionContext):
-            print('\n', '\t' * tab, end='')
+            #print('\n', '\t' * tab, end='')
             df = self.enterDefinition(child)
-          #  pf.write(df)
-            print(df)
+            print(df,'\n')
+        elif isinstance(child, LangParser.Array_defContext):
+            array = str(self.enterArray_def(child))
+            print(array, '\n')
 
     def exitCode(self, ctx:LangParser.CodeContext):
         global tab
-        tab -= 1
+        tab -= 0
 
     def enterMain(self, ctx:LangParser.MainContext):
         print('def main(): ')
@@ -395,6 +416,10 @@ def main():
 
 
    #adding string to file works
+
+    #start
+    init = "\nif __name__ == '__main__':\n\tmain()"
+    print(init)
 
     sys.stdout = orig_stdout
     f.close()
