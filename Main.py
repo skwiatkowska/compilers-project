@@ -385,6 +385,8 @@ class LangVarListener(LangBaseListener):
         tab -= 0
 
     def enterMain(self, ctx:LangParser.MainContext):
+        global tab
+        tab = 0
         print('def main(): ')
         body = self.enterBody(ctx.getChild(1))
         print(body)
