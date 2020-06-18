@@ -1,6 +1,6 @@
 from antlr4 import *
-from LangLexer import LangLexer
-from LangParser import LangParser
+from generated.LangLexer import LangLexer
+from generated.LangParser import LangParser
 from LangVarListener import LangVarListener
 import sys
 

@@ -1,5 +1,5 @@
-from LangListener import LangListener as LangBaseListener
-from LangParser import LangParser
+from generated.LangListener import LangListener as LangBaseListener
+from generated.LangParser import LangParser
 
 
 class LangVarListener(LangBaseListener):
