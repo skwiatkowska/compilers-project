@@ -81,6 +81,16 @@ We are constructing a language which uses polish keywords.
  
  
  '[' ... ']' - block of code
+ 
+ 
+ ## Podział obowiązków podczas tworzenia projektu
+
+Stworzenie gramatyki, wygenerowanie lexera, parsera i drzewa parsowania - Sylwia Kwiatkowska
+
+Stworzenie listenera, za pomocą którego język jest tłumaczony na Pythona - Adrianna Kopeć, Anna Nagi
+
+Napisanie dokumentacji - Adrianna Kopeć, Anna Nagi
+
 
 
 
