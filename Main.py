@@ -11,7 +11,7 @@ def main():
     f = open('python_file.py', 'w')
     sys.stdout = f
 
-    input_stream = FileStream("test1.txt")  # sys.argv[1])
+    input_stream = FileStream("test1.pol")  # sys.argv[1])
 
     lexer = LangLexer(input_stream)
     tokens = CommonTokenStream(lexer)
